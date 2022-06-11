@@ -44,9 +44,7 @@ function sumFile(string $fileName, int $sumResult = null): ?int
     return $sumResult;
 }
 
-/*
- * Read file and return content as data array
- */
+/* Read file and return content as data array */
 function readMyFile(string $fileName): array
 {
     $data = [];
@@ -54,7 +52,10 @@ function readMyFile(string $fileName): array
     if (!empty($fileName) && $file_handle = fopen($fileName, "r")) {
         while (!feof($file_handle)) {
             $line = fgets($file_handle);
-            $data[] = $line;
+            $line = str_replace(["\r", "\n", ""], "", $line);
+            if (!empty($line)) {
+                $data[] = $line;
+            }
         }
         fclose($file_handle);
     }
