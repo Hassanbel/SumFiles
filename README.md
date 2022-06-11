@@ -35,14 +35,13 @@ C.txt - 12
 
 Note that this is just an example. The solution should be able to handle any set of files as described in the problem statement.
 
+### Requirements
+
+PHP 7.4 and later.
+
 ### How to run
 
-1. Go to root path
+1. On your terminal go to project root path
 2. Then run:
-```sh
-~ php index.php A.txt
-```
-Or for multiple files
-```sh
-~ php index.php A.txt B.txt C.txt
-```
+
+> ~ php index.php *FileRelativePath*
