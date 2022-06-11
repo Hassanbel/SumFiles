@@ -1,47 +1,46 @@
 <?php
 
-/*
- * Keeping track of processed files
- * To avoid infinite loop when a file contains same file name as previous ones
- */
+
+/* Keeping track of processed files */
 $fileTracker = [];
+$subFileTracker = [];
 
-/*
- * Passing file names as argument
- */
+/* Passing file name as argument */
 if (isset($argc) && count($argv) > 1) {
-    // reading first argument for file name to calculate its sum
-    foreach ($argv as $key => $file) {
+    $file = $argv[1];
+    if (file_exists($file)) {
+        echo $file . ' - ' . sumFile($file, $GLOBALS['fileTracker']) . "\n";
+        sort($GLOBALS['fileTracker']);
 
-        if (($key !== 0) && file_exists($file)) {
-            echo $file . ' - ' . sumFile($file) . "\n";
-
-            // Reset fileTracker for each file Sum calculation
-            $GLOBALS['fileTracker'] = [];
+        foreach ($GLOBALS['fileTracker'] as $subFile) {
+            if ($subFile) {
+                $GLOBALS['subFileTracker'][] = $subFile;
+                echo $subFile . ' - ' . sumFile($subFile, $GLOBALS['subFileTracker']) . "\n";
+            }
         }
+
+        // Reset files trackers
+        $GLOBALS['fileTracker'] = $GLOBALS['subFileTracker'] = [];
     }
 } else {
     echo "# Please set files names as argument \n";
 }
 
-/*
- * Calculation of file numbers recursive with sub files, plus verify if file exist in fileTracker var
- */
-function sumFile(string $fileName, int $sumResult = null): ?int
+/* Calculation of file numbers recursive with sub files */
+function sumFile(string $fileName, &$fileTracker, int $sumFileResult = null): ?int
 {
     $data = readMyFile($fileName);
 
     foreach ($data as $item) {
-        $item = str_replace(["\r", "\n"], '', $item);
         if (is_numeric($item)) {
-            $sumResult += $item;
-        } else if (count($GLOBALS['fileTracker']) === 0 && !in_array($item, $GLOBALS['fileTracker'], true)) {
-            $sumResult = sumFile($item, $sumResult);
-            $GLOBALS['fileTracker'][] = $item;
+            $sumFileResult += $item;
+        } else if (!in_array($item, $fileTracker, true)) {
+            $sumFileResult = sumFile($item, $fileTracker, $sumFileResult);
+            $fileTracker[] = $item;
         }
     }
 
-    return $sumResult;
+    return $sumFileResult;
 }
 
 /* Read file and return content as data array */
